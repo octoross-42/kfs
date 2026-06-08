@@ -49,13 +49,17 @@ $(BUILD)/%.o: src/%.s
 
 $(BUILD)/%.o: src/%.c
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -I src/drivers -I src/kernel -c -o $@ $<
 
 # Link
 $(NAME): $(OBJS) $(LINKER)
 	$(LD) -m elf_i386 -T $(LINKER) -o $@ $(OBJS)
 
+
 # ───────────────────────────────────────────────────────────────
+test: ${NAME}
+	qemu-system-i386 -kernel ${NAME}
+
 # Image disque + GRUB
 # img: $(NAME)
 # 	dd if=/dev/zero of=$(IMAGE) bs=1M count=32
