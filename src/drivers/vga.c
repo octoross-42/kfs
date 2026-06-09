@@ -20,6 +20,7 @@ void	vga_write_char(unsigned char uc)
 		vga_column = 0;
 		if (++vga_row == VGA_HEIGHT)
 			vga_row = 0;
+		vga_set_cursor(vga_row * VGA_WIDTH + vga_column);
 		return ;
 	}
 
@@ -31,6 +32,7 @@ void	vga_write_char(unsigned char uc)
 		if (++vga_row == VGA_HEIGHT)
 			vga_row = 0;
 	}
+	vga_set_cursor(vga_row * VGA_WIDTH + vga_column);
 }
 
 void	vga_write(unsigned char *str)
@@ -44,5 +46,5 @@ void	vga_goto(size_t column, size_t row)
 {
 	vga_row = row;
 	vga_column = column;
-	vga_set_cursor(row * VGA_WIDTH + column);
+	vga_set_cursor(vga_row * VGA_WIDTH + vga_column);
 }

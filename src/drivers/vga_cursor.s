@@ -18,8 +18,8 @@ vga_set_cursor:
 
 	; -> 0x3D5: valeur de l'octet bas
 	mov dx, 0x3D5
-	mov ecx, [esp + 4]
-	out dx, cl
+	mov eax, [esp + 4]
+	out dx, al
 
 
 ; 	octet haut (registre vga 0x0E)
@@ -32,6 +32,8 @@ vga_set_cursor:
 	; -> 0x3D5: valeur de l'octet haut
 	
 	mov dx, 0x3D5
-	out dx, ch
+	mov eax, [esp + 4]
+	shr eax, 8					; pas juste, out n'accepte que al, ax, eax, pas ah -> nullos
+	out dx, al
 
 	ret
