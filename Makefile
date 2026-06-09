@@ -11,7 +11,8 @@ CFLAGS 		= -m32 -ffreestanding -fno-builtin -fno-exceptions \
 ASMFLAGS	= -f elf32
 
 
-NASM_SRC	= src/boot/boot.s
+NASM_SRC	= src/boot/boot.s \
+			  src/drivers/vga_cursor.s
 C_SRC		= src/kernel/kernel.c \
 			  src/drivers/vga.c
 LINKER		= src/kernel.ld
