@@ -1,7 +1,7 @@
 #ifndef VGA_H
 # define VGA_H
 
-# include "types.h"
+# include "io.h"
 
 // 0x0 = Black    0x8 = Dark Grey
 // 0x1 = Blue     0x9 = Light Blue
@@ -46,11 +46,18 @@ static inline void	vga_write_entry_at(uint16_t entry, size_t column, size_t row)
 	vga_buffer[row * VGA_WIDTH + column] = entry;
 }
 
+static inline void	vga_set_cursor(size_t index)
+{
+	outb(0x3D4, 0x0F);
+	outb(0x3D5, index & 0xFF);
+	outb(0x3D4, 0x0E);
+	outb(0x3D5, (index >> 8) & 0xFF);
+}
+
 void	vga_write(unsigned char *str);
 void	vga_write_char(unsigned char uc);
 void	vga_change_fg(enum vga_color fg);
 void	vga_change_bg(enum vga_color bg);
 void	vga_goto(size_t column, size_t row);
-void	vga_set_cursor(size_t index);
 
 #endif

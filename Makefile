@@ -12,9 +12,9 @@ ASMFLAGS	= -f elf32
 
 
 NASM_SRC	= src/boot/boot.s \
-			  src/drivers/vga_cursor.s
+			  src/io/io.s
 C_SRC		= src/kernel/kernel.c \
-			  src/drivers/vga.c
+			  src/drivers/vga/vga.c
 LINKER		= src/kernel.ld
 
 BUILD		= build
@@ -50,7 +50,7 @@ $(BUILD)/%.o: src/%.s
 
 $(BUILD)/%.o: src/%.c
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -I src/drivers -I src/kernel -c -o $@ $<
+	$(CC) $(CFLAGS) -I src/drivers/vga -I src/kernel -I src/io -c -o $@ $<
 
 # Link
 $(NAME): $(OBJS) $(LINKER)
