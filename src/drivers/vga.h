@@ -51,5 +51,6 @@ void	vga_write_char(unsigned char uc);
 void	vga_change_fg(enum vga_color fg);
 void	vga_change_bg(enum vga_color bg);
 void	vga_goto(size_t column, size_t row);
+void	vga_set_cursor(size_t index);
 
 #endif

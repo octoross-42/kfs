@@ -44,4 +44,5 @@ void	vga_goto(size_t column, size_t row)
 {
 	vga_row = row;
 	vga_column = column;
+	vga_set_cursor(row * VGA_WIDTH + column);
 }
