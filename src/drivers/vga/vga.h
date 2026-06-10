@@ -46,16 +46,22 @@ static inline void	vga_write_entry_at(uint16_t entry, size_t column, size_t row)
 	vga_buffer[row * VGA_WIDTH + column] = entry;
 }
 
-static inline void	vga_set_cursor(size_t index)
+static inline void	vga_set_cursor(size_t column, size_t row)
 {
+	size_t index = row * VGA_WIDTH + column;
 	outb(0x3D4, 0x0F);
-	outb(0x3D5, index & 0xFF);
+	outb(0x3D5, (index & 0xFF));
 	outb(0x3D4, 0x0E);
 	outb(0x3D5, (index >> 8) & 0xFF);
 }
 
+static inline uint16_t	vga_get_entry_at(size_t column, size_t row)
+{
+	return (((uint16_t *)VGA_BUFFER_ADDRESS)[row * VGA_WIDTH + column]);
+}
+
 void	vga_write(unsigned char *str);
-void	vga_write_char(unsigned char uc);
+void	vga_write_uchar(unsigned char uc);
 void	vga_change_fg(enum vga_color fg);
 void	vga_change_bg(enum vga_color bg);
 void	vga_goto(size_t column, size_t row);

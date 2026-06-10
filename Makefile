@@ -14,7 +14,8 @@ ASMFLAGS	= -f elf32
 NASM_SRC	= src/boot/boot.s \
 			  src/io/io.s
 C_SRC		= src/kernel/kernel.c \
-			  src/drivers/vga/vga.c
+			  src/drivers/vga/vga.c \
+			  src/drivers/keyboard/keyboard.c
 LINKER		= src/kernel.ld
 
 BUILD		= build
@@ -50,7 +51,7 @@ $(BUILD)/%.o: src/%.s
 
 $(BUILD)/%.o: src/%.c
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -I src/drivers/vga -I src/kernel -I src/io -c -o $@ $<
+	$(CC) $(CFLAGS) -I src/drivers/keyboard -I src/drivers/vga -I src/kernel -I src/io -c -o $@ $<
 
 # Link
 $(NAME): $(OBJS) $(LINKER)

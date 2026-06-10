@@ -1,15 +1,24 @@
 #include "vga.h"
+#include "keyboard.h"
 
-void	clean_screen(void)
+void	clear_screen(void)
 {
 	size_t	i = 0;
 	while (i ++ < VGA_HEIGHT * VGA_WIDTH)
-		vga_write_char(' ');
+		vga_write_uchar(' ');
+}
+
+void	kfs1_screen(void)
+{
+	vga_goto((VGA_WIDTH / 2) - 4, VGA_HEIGHT / 2 - 2);
+	vga_write((unsigned char *)"octor-os");
+	vga_goto(0, VGA_HEIGHT - 5);
 }
 
 void	kernel_main(void)
 {
-	clean_screen();
-	vga_goto((VGA_WIDTH / 2) - 4, VGA_HEIGHT / 2 - 1);
-	vga_write((unsigned char *)"octor-os");
+	clear_screen();
+
+	kfs1_screen();
+	active_keyboard();
 }
