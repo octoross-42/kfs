@@ -40,10 +40,9 @@ static inline uint16_t	vga_make_entry(unsigned char uc, enum vga_color fg, enum 
 	return (uint16_t)(((bg << 4 | fg) << 8) | uc);
 }
 
-static inline void	vga_write_entry_at(uint16_t entry, size_t column, size_t row)
+static inline void	vga_write_entry_at(uint16_t entry, size_t index)
 {
-	uint16_t	*vga_buffer = (uint16_t *)VGA_BUFFER_ADDRESS;
-	vga_buffer[row * VGA_WIDTH + column] = entry;
+	((uint16_t *)VGA_BUFFER_ADDRESS)[index] = entry;
 }
 
 static inline void	vga_set_cursor(size_t column, size_t row)
@@ -55,7 +54,7 @@ static inline void	vga_set_cursor(size_t column, size_t row)
 	outb(0x3D5, (index >> 8) & 0xFF);
 }
 
-static inline uint16_t	vga_get_entry_at(size_t column, size_t row)
+static inline uint16_t	vga_get_entry(size_t column, size_t row)
 {
 	return (((uint16_t *)VGA_BUFFER_ADDRESS)[row * VGA_WIDTH + column]);
 }
@@ -65,5 +64,10 @@ void	vga_write_uchar(unsigned char uc);
 void	vga_change_fg(enum vga_color fg);
 void	vga_change_bg(enum vga_color bg);
 void	vga_goto(size_t column, size_t row);
+
+
+void	vga_switch_screen(void);
+void	vga_init_screens(void);
+void	vga_clear_screen(uint16_t *screen);
 
 #endif
