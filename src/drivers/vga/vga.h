@@ -2,6 +2,7 @@
 # define VGA_H
 
 # include "io.h"
+# include "string.h"
 # include <stdarg.h>
 
 // 0x0 = Black    0x8 = Dark Grey

@@ -41,7 +41,7 @@ void	vga_line_scroll(void)
 static void	vga_write_uint32_base_aux(uint32_t n, const char *base, size_t len)
 {
 	if (n >= len)
-		aux(n / len);
+		vga_write_uint32_base_aux(n / len, base, len);
 	vga_write_uchar(base[n % len]);
 }
 
