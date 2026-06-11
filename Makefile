@@ -20,6 +20,13 @@ C_SRC		= src/kernel/kernel.c \
 			  src/drivers/keyboard/keyboard.c
 LINKER		= src/kernel.ld
 
+INCLUDE_DIR	= src/lib	\
+			  src/lib/string \
+			  src/drivers/io \
+			  src/drivers/vga \
+			  src/drivers/keyboard
+INCLUDE		= $(addprefix -I , $(INCLUDE_DIR))
+
 BUILD		= build
 NASM_OBJ	= $(patsubst src/%.s,$(BUILD)/%.o,$(NASM_SRC))
 C_OBJ   	= $(patsubst src/%.c,$(BUILD)/%.o,$(C_SRC))
@@ -53,7 +60,7 @@ $(BUILD)/%.o: src/%.s
 
 $(BUILD)/%.o: src/%.c
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -I src/lib -I src/lib/string -I src/drivers/keyboard -I src/drivers/vga -I src/kernel -I src/io -c -o $@ $<
+	$(CC) $(CFLAGS) $(INCLUDE) -c -o $@ $<
 
 # Link
 $(NAME): $(OBJS) $(LINKER)
