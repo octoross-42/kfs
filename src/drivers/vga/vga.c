@@ -16,7 +16,7 @@ static size_t			alt_column = 0;
 void	vga_change_fg(enum vga_color fg) { vga_fg = fg; }
 void	vga_change_bg(enum vga_color bg) { vga_bg = bg; }
 
-void	line_scroll(void)
+void	vga_line_scroll(void)
 {
 	size_t row;
 	size_t column;
@@ -38,13 +38,66 @@ void	line_scroll(void)
 	
 }
 
+static void	vga_write_uint32_base_aux(uint32_t n, const char *base, size_t len)
+{
+	if (n >= len)
+		aux(n / len);
+	vga_write_uchar(base[n % len]);
+}
+
+void	vga_write_uint32_base(uint32_t n, const char *base)
+{
+	// TTC - Trust The Caller
+	//		base != NULL	-> segfault sur strlen
+	//		base != ""		-> division par 0 (DE: Division error, exception cpu)
+	// 		len(base) > 1	-> infinite loop 
+	vga_write_uint32_base_aux(n, base, strlen(base));
+}
+
+void	vga_write_uint32(uint32_t n)
+{
+	static const char * base = "0123456789";
+	vga_write_uint32_base(n, base);
+}
+
+void	vga_write_int32(int32_t n)
+{
+	static const char * base = "0123456789";
+	if (n < 0)
+	{
+		vga_write_uchar('-');
+		return vga_write_uint32_base((uint32_t)-n, base);
+	}
+	vga_write_uint32_base((uint32_t)n, base);
+}
+
+void vga_write_uint32_padded(uint32_t n, const char *base, size_t padding)
+{
+    size_t  len = strlen(base);
+    size_t  digits = 1;
+    uint32_t tmp = n / len;
+
+    while ((tmp > 0) && (digits < padding ))
+	{
+		digits ++;
+		tmp /= len;
+	}
+
+    while (digits < padding)
+    {
+        vga_write_uchar(base[0]);	// padding
+        padding--;
+    }
+    vga_write_uint32_base(n, base);
+}
+
 void	vga_write_uchar(unsigned char uc)
 {
 	if (uc == '\n')
 	{
 		vga_column = 0;
 		if (vga_row + 1 == VGA_HEIGHT)
-			line_scroll();
+			vga_line_scroll();
 		else
 			vga_row ++;
 		vga_set_cursor(vga_column, vga_row);
@@ -57,7 +110,7 @@ void	vga_write_uchar(unsigned char uc)
 	{
 		vga_column = 0;
 		if (vga_row + 1 == VGA_HEIGHT)
-			line_scroll();
+			vga_line_scroll();
 		else
 			vga_row ++;
 		

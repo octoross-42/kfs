@@ -2,6 +2,7 @@
 # define VGA_H
 
 # include "io.h"
+# include "lib.h"
 
 // 0x0 = Black    0x8 = Dark Grey
 // 0x1 = Blue     0x9 = Light Blue
@@ -40,6 +41,11 @@ static inline uint16_t	vga_make_entry(unsigned char uc, enum vga_color fg, enum 
 	return (uint16_t)(((bg << 4 | fg) << 8) | uc);
 }
 
+static inline uint16_t	vga_get_entry(size_t column, size_t row)
+{
+	return (((uint16_t *)VGA_BUFFER_ADDRESS)[row * VGA_WIDTH + column]);
+}
+
 static inline void	vga_write_entry_at(uint16_t entry, size_t index)
 {
 	((uint16_t *)VGA_BUFFER_ADDRESS)[index] = entry;
@@ -54,19 +60,22 @@ static inline void	vga_set_cursor(size_t column, size_t row)
 	outb(0x3D5, (index >> 8) & 0xFF);
 }
 
-static inline uint16_t	vga_get_entry(size_t column, size_t row)
-{
-	return (((uint16_t *)VGA_BUFFER_ADDRESS)[row * VGA_WIDTH + column]);
-}
 
 void	vga_write(char *str);
 void	vga_write_uchar(unsigned char uc);
-void	vga_change_fg(enum vga_color fg);
-void	vga_change_bg(enum vga_color bg);
-void	vga_goto(size_t column, size_t row);
 
+void	vga_write_uint32(uint32_t n);
+void	vga_write_int32(int32_t n);
+void	vga_write_uint32_base(uint32_t n, const char *base);
+void	vga_write_uint32_padded(uint32_t n, const char *base, size_t padding);
+void	printk(const char *format, ...);
 
 void	vga_backspace(void);
+
+void	vga_goto(size_t column, size_t row);
+
+void	vga_change_fg(enum vga_color fg);
+void	vga_change_bg(enum vga_color bg);
 
 void	vga_switch_screen(void);
 void	vga_init_screens(void);
