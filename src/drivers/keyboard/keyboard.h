@@ -2,7 +2,6 @@
 
 # define KEYBOARD_H
 
-# include "io.h"
 # include "vga.h"
 
 static const unsigned char scancode_table[] = {

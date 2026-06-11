@@ -9,8 +9,6 @@ unsigned char	scancode_to_ascii(uint8_t scancode)
 	return (scancode_table[scancode]);
 }
 
-
-
 void	active_keyboard(void)
 {
 	unsigned char c;

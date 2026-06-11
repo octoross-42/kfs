@@ -1,4 +1,3 @@
-#include "vga.h"
 #include "keyboard.h"
 
 void	kfs1_screen(void)
