@@ -13,8 +13,61 @@ static uint16_t			alt_screen[VGA_WIDTH * VGA_HEIGHT];
 static size_t			alt_row = 0;
 static size_t			alt_column = 0;
 
+static uint8_t			cursor_toggle = 1;
+static uint32_t			cursor_tick = 0;
+
 void	vga_change_fg(enum vga_color fg) { vga_fg = fg; }
 void	vga_change_bg(enum vga_color bg) { vga_bg = bg; }
+
+static void	vga_empty_at(size_t index)
+{
+	vga_write_entry_at(vga_make_entry(0, vga_fg, vga_bg), index);
+}
+
+void	vga_draw_cursor(void)
+{
+	vga_write_entry_at(vga_make_entry(CURSOR_CHAR, vga_fg, vga_bg), vga_row * VGA_WIDTH + vga_column);
+}
+
+void	vga_reset_cursor(void)
+{
+	cursor_tick = 0;
+	vga_draw_cursor();
+}
+
+void	vga_set_cursor(size_t column, size_t row)
+{
+	size_t index = row * VGA_WIDTH + column;
+	outb(0x3D4, 0x0F);
+	outb(0x3D5, (index & 0xFF));
+	outb(0x3D4, 0x0E);
+	outb(0x3D5, (index >> 8) & 0xFF);
+	
+	vga_reset_cursor();
+}
+
+void	vga_toggle_cursor(void)
+{
+	cursor_tick = 0;
+	if (cursor_toggle)
+	{
+		cursor_toggle = 0;
+		vga_empty_at(vga_row * VGA_WIDTH + vga_column);
+	}
+	else
+	{
+		cursor_toggle = 1;
+		vga_draw_cursor();
+	}
+}
+
+void	vga_tick_cursor(void)
+{
+	cursor_tick ++;
+	if (cursor_tick == 50000)	
+		vga_toggle_cursor();
+}
+
 
 void	vga_line_scroll(void)
 {
@@ -34,7 +87,7 @@ void	vga_line_scroll(void)
 	}
 	column = 0;
 	while (column < VGA_WIDTH)
-		vga_write_entry_at(vga_make_entry(' ', vga_fg, vga_bg), row * VGA_WIDTH + (column ++));
+		vga_empty_at(row * VGA_WIDTH + (column ++));
 	
 }
 
@@ -94,7 +147,9 @@ void vga_write_uint32_padded(uint32_t n, const char *base, size_t padding)
 void	vga_write_uchar(unsigned char uc)
 {
 	if (uc == '\n')
-	{
+	{	
+		vga_empty_at(vga_column + vga_row * VGA_WIDTH);			// erase cursor, if not newline will get replaced by the new uchar we're writing
+	
 		vga_column = 0;
 		if (vga_row + 1 == VGA_HEIGHT)
 			vga_line_scroll();
@@ -149,7 +204,7 @@ void	vga_switch_screen(void)
 {
 	size_t		index = 0;
 	uint16_t	tmp;
-	
+
 	tmp = vga_row;
 	vga_row = alt_row;
 	alt_row = tmp;
@@ -179,6 +234,8 @@ void	vga_backspace(void)
 	else
 		vga_column --;
 	
-	vga_write_entry_at(vga_make_entry(' ', vga_fg, vga_bg), vga_column + vga_row * VGA_WIDTH);
+	vga_empty_at(vga_column + vga_row * VGA_WIDTH);
+	vga_empty_at(vga_column + vga_row * VGA_WIDTH + 1);
+	
 	vga_goto(vga_column, vga_row);
 }

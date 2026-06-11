@@ -12,10 +12,13 @@ unsigned char	scancode_to_ascii(uint8_t scancode)
 void	active_keyboard(void)
 {
 	unsigned char c;
+
 	while (1)
 	{
+		vga_tick_cursor();
 		while (!(inb(KEYBOARD_STATUS_PORT) & 0x01))
-			;
+			vga_tick_cursor();
+			
 		uint8_t sc = inb(KEYBOARD_DATA_PORT);
 		if (sc == 0x0E)
 			vga_backspace();

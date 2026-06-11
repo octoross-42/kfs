@@ -52,16 +52,6 @@ static inline void	vga_write_entry_at(uint16_t entry, size_t index)
 	((uint16_t *)VGA_BUFFER_ADDRESS)[index] = entry;
 }
 
-static inline void	vga_set_cursor(size_t column, size_t row)
-{
-	size_t index = row * VGA_WIDTH + column;
-	outb(0x3D4, 0x0F);
-	outb(0x3D5, (index & 0xFF));
-	outb(0x3D4, 0x0E);
-	outb(0x3D5, (index >> 8) & 0xFF);
-}
-
-
 void	vga_write(char *str);
 void	vga_write_uchar(unsigned char uc);
 
@@ -81,5 +71,12 @@ void	vga_change_bg(enum vga_color bg);
 void	vga_switch_screen(void);
 void	vga_init_screens(void);
 void	vga_clear_screen(uint16_t *screen);
+
+# define CURSOR_CHAR	0xDB		// bloc plein
+// # define CURSOR_CHAR	'_'
+void	vga_draw_cursor(void);
+void	vga_toggle_cursor(void);
+void	vga_reset_cursor(void);
+void	vga_tick_cursor(void);
 
 #endif
