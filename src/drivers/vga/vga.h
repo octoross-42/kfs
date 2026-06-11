@@ -59,12 +59,14 @@ static inline uint16_t	vga_get_entry(size_t column, size_t row)
 	return (((uint16_t *)VGA_BUFFER_ADDRESS)[row * VGA_WIDTH + column]);
 }
 
-void	vga_write(unsigned char *str);
+void	vga_write(char *str);
 void	vga_write_uchar(unsigned char uc);
 void	vga_change_fg(enum vga_color fg);
 void	vga_change_bg(enum vga_color bg);
 void	vga_goto(size_t column, size_t row);
 
+
+void	vga_backspace(void);
 
 void	vga_switch_screen(void);
 void	vga_init_screens(void);

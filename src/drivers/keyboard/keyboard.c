@@ -19,7 +19,9 @@ void	active_keyboard(void)
 		while (!(inb(KEYBOARD_STATUS_PORT) & 0x01))
 			;
 		uint8_t sc = inb(KEYBOARD_DATA_PORT);
-		if (sc == 0x1D)
+		if (sc == 0x0E)
+			vga_backspace();
+		else if (sc == 0x1D)
 		{
 			ctrl_pressed = 1;
 			c = 0;
@@ -29,7 +31,7 @@ void	active_keyboard(void)
 			ctrl_pressed = 0;
 			c = 0;
 		}
-		else if ((sc == 0x4D) || (sc == 0x4B))
+		else if ((sc == 0x4D) || (sc == 0x4B)) // fleche droite ou gauche
 		{	
 			if (ctrl_pressed)
 				vga_switch_screen();

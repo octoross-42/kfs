@@ -65,11 +65,11 @@ void	vga_write_uchar(unsigned char uc)
 	vga_set_cursor(vga_column, vga_row);
 }
 
-void	vga_write(unsigned char *str)
+void	vga_write(char *str)
 {
 	unsigned int i = 0;
 	while (str[i])
-		vga_write_uchar(str[i ++]);
+		vga_write_uchar((unsigned char)str[i ++]);
 }
 
 void	vga_goto(size_t column, size_t row)
@@ -110,5 +110,22 @@ void	vga_switch_screen(void)
 		alt_screen[index] = ((uint16_t *)VGA_BUFFER_ADDRESS)[index];
 		vga_write_entry_at(tmp, index ++);
 	}
+	vga_goto(vga_column, vga_row);
+}
+
+void	vga_backspace(void)
+{
+	if (vga_column == 0)
+	{
+		if (vga_row == 0)
+		return ;
+		
+		vga_row --;
+		vga_column = VGA_WIDTH - 1; 
+	}
+	else
+		vga_column --;
+	
+	vga_write_entry_at(vga_make_entry(' ', vga_fg, vga_bg), vga_column + vga_row * VGA_WIDTH);
 	vga_goto(vga_column, vga_row);
 }
