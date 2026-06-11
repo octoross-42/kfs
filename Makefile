@@ -12,7 +12,7 @@ ASMFLAGS	= -f elf32
 
 
 NASM_SRC	= src/boot/boot.s \
-			  src/io/io.s \
+			  src/drivers/io/io.s \
 			  src/lib/string/strlen.s
 C_SRC		= src/kernel/kernel.c \
 			  src/drivers/vga/vga.c \
@@ -33,7 +33,7 @@ C_OBJ   	= $(patsubst src/%.c,$(BUILD)/%.o,$(C_SRC))
 OBJS 		= ${NASM_OBJ} ${C_OBJ}
 
 NAME		= octor-os-kfs-1.elf
-IMAGE 		= octor-os-kfs-1.img
+IMAGE 		= octor-os-kfs-1.iso
 
 # ───────────────────────────────────────────────────────────────
 # Colors, format
@@ -68,33 +68,35 @@ $(NAME): $(OBJS) $(LINKER)
 
 
 # ───────────────────────────────────────────────────────────────
-test: ${NAME}
+# Image
+
+image-installs:
+	sudo apt install -y grub-pc-bin grub-common xorriso
+
+$(IMAGE): $(NAME)
+	mkdir -p iso/boot/grub
+	cp $(NAME) iso/boot/
+	echo 'set timeout=0\nset default=0\nmenuentry "octor-os" { multiboot /boot/$(NAME)\nboot }' > iso/boot/grub/grub.cfg
+	grub-mkrescue -o $(IMAGE) iso/
+
+# ───────────────────────────────────────────────────────────────
+# Run
+
+# run with kernel elf, not img, dev
+run-dev: ${NAME}
 	qemu-system-i386 -kernel ${NAME}
 
-# Image disque + GRUB
-# img: $(NAME)
-# 	dd if=/dev/zero of=$(IMAGE) bs=1M count=32
-# 	parted $(IMAGE) mklabel msdos
-# 	parted $(IMAGE) mkpart primary ext2 1MiB 31MiB
-# 	parted $(IMAGE) set 1 boot on
-# 	sudo losetup -Pf --show $(IMAGE)         # → /dev/loopX
-# 	@echo "Suite : mkfs, grub-install, copier kernel.elf — voir README"
+kvm-perms:
+	sudo chmod 666 /dev/kvm
 
-# # Lance avec KVM
-# run: $(IMAGE)
-# 	qemu-system-i386 \
-# 		-drive file=$(IMAGE),format=raw \
-# 		-enable-kvm \
-# 		-m 256M \
-# 		-serial stdio
-
-# Debug sans KVM (si KVM indispo)
-# run-debug: $(IMAGE)
-# 	qemu-system-i386 \
-# 		-drive file=$(IMAGE),format=raw \
-# 		-m 256M \
-# 		-serial stdio \
-# 		-s -S
+# run with KVM and os img
+run: $(IMAGE)
+	qemu-system-i386 \
+		-drive file=$(IMAGE),format=raw \
+		-enable-kvm \
+		-m 256M \
+		-serial stdio
+# 			-> redirige COM1 (vm) vers stdio (host)
 
 
 # ───────────────────────────────────────────────────────────────
