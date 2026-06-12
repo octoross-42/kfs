@@ -15,18 +15,23 @@ NASM_SRC	= src/boot/boot.s \
 			  src/drivers/io/io.s \
 			  src/lib/string/strlen.s
 C_SRC		= src/kernel/kernel.c \
+			  src/kernel/print_multiboot_data.c \
 			  src/drivers/vga/vga.c \
-			  src/drivers/vga/printk.c \
 			  src/drivers/keyboard/keyboard.c \
-			  src/drivers/serial/serial_com1.c
+			  src/drivers/serial/serial_com1.c \
+			  src/lib/kprint/kfprintf.c \
+			  src/lib/kprint/printk.c
 LINKER		= src/kernel.ld
 
-INCLUDE_DIR	= src/lib	\
+INCLUDE_DIR	= src/kernel \
+			  src/lib	\
 			  src/lib/string \
 			  src/drivers/io \
 			  src/drivers/vga \
 			  src/drivers/keyboard \
-			  src/drivers/serial
+			  src/drivers/serial \
+			  src/lib/kprint
+
 INCLUDE		= $(addprefix -I , $(INCLUDE_DIR))
 
 BUILD		= build

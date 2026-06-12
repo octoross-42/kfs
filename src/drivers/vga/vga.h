@@ -55,12 +55,6 @@ static inline void	vga_write_entry_at(uint16_t entry, size_t index)
 void	vga_write(char *str);
 void	vga_write_char(char uc);
 
-void	vga_write_uint32(uint32_t n);
-void	vga_write_int32(int32_t n);
-void	vga_write_uint32_base(uint32_t n, const char *base);
-void	vga_write_uint32_padded(uint32_t n, const char *base, size_t padding);
-void	printk(const char *format, ...);
-
 void	vga_backspace(void);
 
 void	vga_goto(size_t column, size_t row);

@@ -49,6 +49,7 @@ _start:
 	; future pagination enabling, on n'a pas ca encore :)
 	; future tout en fait, tout ce qui est concepts de code qui n'est pas basique (global, exception, etc)
 
+	push ebx
 	call kernel_main
 
 	cli								; safety measure, kernel_main shouldnt return to here

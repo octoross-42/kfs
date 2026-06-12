@@ -91,59 +91,6 @@ void	vga_line_scroll(void)
 	
 }
 
-static void	vga_write_uint32_base_aux(uint32_t n, const char *base, size_t len)
-{
-	if (n >= len)
-		vga_write_uint32_base_aux(n / len, base, len);
-	vga_write_char(base[n % len]);
-}
-
-void	vga_write_uint32_base(uint32_t n, const char *base)
-{
-	// TTC - Trust The Caller
-	//		base != NULL	-> segfault sur strlen
-	//		base != ""		-> division par 0 (DE: Division error, exception cpu)
-	// 		len(base) > 1	-> infinite loop 
-	vga_write_uint32_base_aux(n, base, strlen(base));
-}
-
-void	vga_write_uint32(uint32_t n)
-{
-	static const char * base = "0123456789";
-	vga_write_uint32_base(n, base);
-}
-
-void	vga_write_int32(int32_t n)
-{
-	static const char * base = "0123456789";
-	if (n < 0)
-	{
-		vga_write_char('-');
-		return vga_write_uint32_base((uint32_t)-n, base);
-	}
-	vga_write_uint32_base((uint32_t)n, base);
-}
-
-void vga_write_uint32_padded(uint32_t n, const char *base, size_t padding)
-{
-    size_t  len = strlen(base);
-    size_t  digits = 1;
-    uint32_t tmp = n / len;
-
-    while ((tmp > 0) && (digits < padding ))
-	{
-		digits ++;
-		tmp /= len;
-	}
-
-    while (digits < padding)
-    {
-        vga_write_char(base[0]);	// padding
-        padding--;
-    }
-    vga_write_uint32_base(n, base);
-}
-
 void	vga_write_char(char uc)
 {
 	if (uc == '\n')
@@ -175,9 +122,8 @@ void	vga_write_char(char uc)
 
 void	vga_write(char *str)
 {
-	unsigned int i = 0;
-	while (str[i])
-		vga_write_char(str[i ++]);
+	while (* str)
+		vga_write_char(*(str ++));
 }
 
 void	vga_goto(size_t column, size_t row)
