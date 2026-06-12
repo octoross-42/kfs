@@ -37,7 +37,7 @@ enum vga_color
 # define VGA_HEIGHT		25
 # define VGA_BUFFER_ADDRESS	0xB8000
 
-static inline uint16_t	vga_make_entry(unsigned char uc, enum vga_color fg, enum vga_color bg)
+static inline uint16_t	vga_make_entry(char uc, enum vga_color fg, enum vga_color bg)
 {
 	return (uint16_t)(((bg << 4 | fg) << 8) | uc);
 }
@@ -53,7 +53,7 @@ static inline void	vga_write_entry_at(uint16_t entry, size_t index)
 }
 
 void	vga_write(char *str);
-void	vga_write_uchar(unsigned char uc);
+void	vga_write_char(char uc);
 
 void	vga_write_uint32(uint32_t n);
 void	vga_write_int32(int32_t n);

@@ -2,7 +2,7 @@
 
 static uint8_t			ctrl_pressed = 0;
 
-unsigned char	scancode_to_ascii(uint8_t scancode)
+char	scancode_to_ascii(uint8_t scancode)
 {
 	if (scancode & 0x80) return 0;		// key release
 	if (scancode >= sizeof(scancode_table)) return 0;
@@ -11,7 +11,7 @@ unsigned char	scancode_to_ascii(uint8_t scancode)
 
 void	active_keyboard(void)
 {
-	unsigned char c;
+	char c;
 
 	while (1)
 	{
@@ -41,7 +41,7 @@ void	active_keyboard(void)
 		{
 			c = scancode_to_ascii(sc);
 			if (c)	
-				vga_write_uchar(c);
+				vga_write_char(c);
 		}
 	}
 }

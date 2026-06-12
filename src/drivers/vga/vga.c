@@ -95,7 +95,7 @@ static void	vga_write_uint32_base_aux(uint32_t n, const char *base, size_t len)
 {
 	if (n >= len)
 		vga_write_uint32_base_aux(n / len, base, len);
-	vga_write_uchar(base[n % len]);
+	vga_write_char(base[n % len]);
 }
 
 void	vga_write_uint32_base(uint32_t n, const char *base)
@@ -118,7 +118,7 @@ void	vga_write_int32(int32_t n)
 	static const char * base = "0123456789";
 	if (n < 0)
 	{
-		vga_write_uchar('-');
+		vga_write_char('-');
 		return vga_write_uint32_base((uint32_t)-n, base);
 	}
 	vga_write_uint32_base((uint32_t)n, base);
@@ -138,17 +138,17 @@ void vga_write_uint32_padded(uint32_t n, const char *base, size_t padding)
 
     while (digits < padding)
     {
-        vga_write_uchar(base[0]);	// padding
+        vga_write_char(base[0]);	// padding
         padding--;
     }
     vga_write_uint32_base(n, base);
 }
 
-void	vga_write_uchar(unsigned char uc)
+void	vga_write_char(char uc)
 {
 	if (uc == '\n')
 	{	
-		vga_empty_at(vga_column + vga_row * VGA_WIDTH);			// erase cursor, if not newline will get replaced by the new uchar we're writing
+		vga_empty_at(vga_column + vga_row * VGA_WIDTH);			// erase cursor, if not newline will get replaced by the new char we're writing
 	
 		vga_column = 0;
 		if (vga_row + 1 == VGA_HEIGHT)
@@ -177,7 +177,7 @@ void	vga_write(char *str)
 {
 	unsigned int i = 0;
 	while (str[i])
-		vga_write_uchar((unsigned char)str[i ++]);
+		vga_write_char(str[i ++]);
 }
 
 void	vga_goto(size_t column, size_t row)
