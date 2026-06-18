@@ -6,7 +6,7 @@
 /*   By: octoross <octoross@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/15 19:34:50 by octoross          #+#    #+#             */
-/*   Updated: 2026/06/18 13:50:27 by octoross         ###   ########.fr       */
+/*   Updated: 2026/06/18 14:18:37 by octoross         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,13 +36,13 @@ void gdt_init_flat(void)
 	// 0: Null descriptor — obligatoire, pour pouvoir fault quand segment adress = 0
     gdt_set_entry(&gdt[0], 0, 0, 0, 0);
 
-    gdt_set_entry(&gdt[1], 0, 0xFFFFFFFF, KERNEL_CODE_SEGMENT_ACCESS, SEGMENT_LIMIT_FLAGS);	// Kernel Code
-    gdt_set_entry(&gdt[2], 0, 0xFFFFFFFF, KERNEL_DATA_SEGMENT_ACCESS, SEGMENT_LIMIT_FLAGS);	// Kernel Data
-    gdt_set_entry(&gdt[3], 0, 0xFFFFFFFF, KERNEL_DATA_SEGMENT_ACCESS, SEGMENT_LIMIT_FLAGS);	// Kernel Stack
+    gdt_set_entry(&gdt[1], 0, 0xFFFFF, KERNEL_CODE_SEGMENT_ACCESS, SEGMENT_LIMIT_FLAGS);	// Kernel Code
+    gdt_set_entry(&gdt[2], 0, 0xFFFFF, KERNEL_DATA_SEGMENT_ACCESS, SEGMENT_LIMIT_FLAGS);	// Kernel Data
+    gdt_set_entry(&gdt[3], 0, 0xFFFFF, KERNEL_DATA_SEGMENT_ACCESS, SEGMENT_LIMIT_FLAGS);	// Kernel Stack
 
-    gdt_set_entry(&gdt[4], 0, 0xFFFFFFFF, USER_CODE_SEGMENT_ACCESS, SEGMENT_LIMIT_FLAGS);	// User Code
-    gdt_set_entry(&gdt[5], 0, 0xFFFFFFFF, USER_DATA_SEGMENT_ACCESS, SEGMENT_LIMIT_FLAGS);	// User Data
-    gdt_set_entry(&gdt[6], 0, 0xFFFFFFFF, USER_DATA_SEGMENT_ACCESS, SEGMENT_LIMIT_FLAGS);	// User Stack
+    gdt_set_entry(&gdt[4], 0, 0xFFFFF, USER_CODE_SEGMENT_ACCESS, SEGMENT_LIMIT_FLAGS);	// User Code
+    gdt_set_entry(&gdt[5], 0, 0xFFFFF, USER_DATA_SEGMENT_ACCESS, SEGMENT_LIMIT_FLAGS);	// User Data
+    gdt_set_entry(&gdt[6], 0, 0xFFFFF, USER_DATA_SEGMENT_ACCESS, SEGMENT_LIMIT_FLAGS);	// User Stack
 	
 	gdtr.limit = sizeof(gdt_entry_t) * GDT_ENTRIES - 1;
     gdtr.base  = (uint32_t)gdt;
