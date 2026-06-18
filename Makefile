@@ -13,14 +13,16 @@ ASMFLAGS	= -f elf32
 
 NASM_SRC	= src/boot/boot.s \
 			  src/drivers/io/io.s \
-			  src/lib/string/strlen.s
+			  src/lib/string/strlen.s \
+			  src/gdt/lgdt.s
 C_SRC		= src/kernel/kernel.c \
 			  src/kernel/print_multiboot_data.c \
 			  src/drivers/vga/vga.c \
 			  src/drivers/keyboard/keyboard.c \
 			  src/drivers/serial/serial_com1.c \
 			  src/lib/kprint/kfprintf.c \
-			  src/lib/kprint/printk.c
+			  src/lib/kprint/printk.c \
+			  src/gdt/gdt.c
 LINKER		= src/kernel.ld
 
 INCLUDE_DIR	= src/kernel \
@@ -30,7 +32,8 @@ INCLUDE_DIR	= src/kernel \
 			  src/drivers/vga \
 			  src/drivers/keyboard \
 			  src/drivers/serial \
-			  src/lib/kprint
+			  src/lib/kprint \
+			  src/gdt
 
 INCLUDE		= $(addprefix -I , $(INCLUDE_DIR))
 
@@ -105,6 +108,13 @@ run: $(IMAGE)
 		-serial stdio
 # 			-> redirige COM1 (vm) vers stdio (host)
 
+run-debug: $(IMAGE)
+	qemu-system-i386 \
+		-s -S
+		-drive file=$(IMAGE),format=raw \
+		-enable-kvm \
+		-m 256M \
+		-serial stdio
 
 # ───────────────────────────────────────────────────────────────
 # Clean, re

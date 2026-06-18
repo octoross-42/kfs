@@ -37,6 +37,7 @@ section .bss
 ; there's only us here, and what we coded, so nothing much for the moment (nothing at all), but in return we're all powerful (no restrictions nor safeguards, scary)
 
 extern kernel_main
+extern gdt_init_flat
 
 section .text
 	global _start
@@ -45,11 +46,12 @@ _start:
 
 	mov esp, stack_top				; on initialise la stack (esp), sinon comportement indéfini
 
-	; future gdt ici :) (global descriptor table, descriptor de segments de mémoire, avec permissions, types taille et adresse évidemment)
+	push ebx
+	
+	call gdt_init_flat
 	; future pagination enabling, on n'a pas ca encore :)
 	; future tout en fait, tout ce qui est concepts de code qui n'est pas basique (global, exception, etc)
 
-	push ebx
 	call kernel_main
 
 	cli								; safety measure, kernel_main shouldnt return to here
