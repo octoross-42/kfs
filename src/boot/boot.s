@@ -23,6 +23,8 @@ section .multiboot
 ; 	-> stack_bottom est la premiere adresse 16 bytes aligned
 ; 	-> stack_top est l'adresse 16384 bytes plus loin -> l'intérieur de la stack = 16384 bytes
 
+global stack_top
+
 section .bss
 	align 16						; stack must be 16-byte aligned on x86
 	stack_bottom:					

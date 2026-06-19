@@ -3,7 +3,9 @@
 void	kfs1_screen(void)
 {
 	vga_goto((VGA_WIDTH / 2) - 1, VGA_HEIGHT / 2 - 2);
+	vga_write(ansi(36, -1));
 	vga_write("42");
+	vga_write(ansi(0, -1));
 }
 
 
@@ -15,7 +17,6 @@ void	kernel_main(void *mboot_ptr)
 	kfs1_screen();
 
 	print_multiboot_data(mboot_ptr);
-
 
 	active_keyboard();
 }

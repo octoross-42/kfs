@@ -73,4 +73,6 @@ void	vga_toggle_cursor(void);
 void	vga_reset_cursor(void);
 void	vga_tick_cursor(void);
 
+# include "kprint.h"
+
 #endif

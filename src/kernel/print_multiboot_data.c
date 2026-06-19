@@ -68,6 +68,7 @@ void	print_multiboot_data(void *mboot_ptr)
 {
 	multiboot_data_t *mbd = (multiboot_data_t *)mboot_ptr;
 
+	printk("\n");
 	if (mbd->flags & (1 << 0))
 	{
 		printk("mem_lower: %u KB\n", mbd->mem_lower);
@@ -89,11 +90,12 @@ void	print_multiboot_data(void *mboot_ptr)
 		multiboot_mmap_entry_t *entry = (multiboot_mmap_entry_t *)mbd->mmap_addr;
 		while ((uint32_t)entry < mbd->mmap_addr + mbd->mmap_length)
 		{
-			printk("  base: %p  len: %x  type: %u\n",
+			printk("  base: %p  len: %x  \ttype: %u\n",
 				(uint32_t)entry->addr,
 				(uint32_t)entry->len,
 				entry->type);
 			entry = (multiboot_mmap_entry_t *)((uint32_t)entry + entry->size + sizeof(entry->size));
 		}
 	}
+	printk("\n");
 }

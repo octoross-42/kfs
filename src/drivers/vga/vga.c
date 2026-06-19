@@ -19,6 +19,74 @@ static uint32_t			cursor_tick = 0;
 void	vga_change_fg(enum vga_color fg) { vga_fg = fg; }
 void	vga_change_bg(enum vga_color bg) { vga_bg = bg; }
 
+static void	apply_ansi_code(unsigned int code)
+{
+	static const enum vga_color	ansi_to_vga[8] =
+	{
+		0x0, // Black
+        0x4, // Red
+        0x2, // Green
+        0x6, // Yellow/Brown
+        0x1, // Blue
+        0x5, // Magenta
+        0x3, // Cyan
+        0x7, // White
+	};
+
+	if (code == 0)
+	{
+		vga_change_fg(VGA_COLOR_DARK_GREY);
+		return vga_change_bg(VGA_COLOR_BLACK);
+	}
+	if (code == 1)						// bold
+		return vga_change_fg(vga_fg | 0b1000);	// bit 3 = bit d'intensité
+	if ((code == 2) || (code == 22))	// dim
+		return vga_change_fg(vga_fg & 0b0111);	// bit 3 = bit d'intensité
+	if (code == 5)						// blink ?
+		return vga_change_bg(vga_bg | 0b1000);	// bit 7 = bit de blink (entry = bg (4bits) + fg (4bits) + c (8 bits)), pour styliser -> 8 bits
+	if (code == 7)						// reverse
+	{
+		enum vga_color bg = vga_bg;
+		vga_change_bg(vga_fg);
+		return vga_change_fg(bg);
+	}
+	if ((30 <= code) && (code <= 37))
+		return vga_change_fg(ansi_to_vga[code - 30]);
+	if ((40 <= code) && code <= 47)
+		return vga_change_bg(ansi_to_vga[code - 40]);
+	if ((90 <= code) && (code <= 97))
+		return vga_change_fg(ansi_to_vga[code - 90] + 8);
+	if ((100 <= code) && code <= 107)
+		return vga_change_bg(ansi_to_vga[code - 100] + 8);
+	return ;
+}
+
+static unsigned int	apply_ansi(char *str)
+{
+	unsigned int i = 0;
+	unsigned int code = 0;
+	while (str[i])
+	{
+		if (('0' <= str[i]) && (str[i] <= '9'))
+			code = code * 10 + (str[i] - '0');
+		else if (str[i] == ';')
+		{
+			apply_ansi_code(code);
+			code = 0;
+		}
+		else if (str[i] == 'm')
+		{
+			apply_ansi_code(code);
+			return (i + 1);
+		}
+		else
+			return (i + 1);
+		i ++;
+	}
+	return (i);
+}
+
+
 static void	vga_empty_at(size_t index)
 {
 	vga_write_entry_at(vga_make_entry(0, vga_fg, vga_bg), index);
@@ -122,8 +190,20 @@ void	vga_write_char(char uc)
 
 void	vga_write(char *str)
 {
+	unsigned int i;
+
 	while (* str)
-		vga_write_char(*(str ++));
+	{
+		if (*str == '\033')
+		{
+			if (*(++ str) != '[')	// check si ansi code
+				continue ;
+			i = apply_ansi(++str);
+			str += i;
+		}
+		else
+			vga_write_char(*(str ++));
+	}
 }
 
 void	vga_goto(size_t column, size_t row)

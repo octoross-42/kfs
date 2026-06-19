@@ -22,7 +22,9 @@ C_SRC		= src/kernel/kernel.c \
 			  src/drivers/serial/serial_com1.c \
 			  src/lib/kprint/kfprintf.c \
 			  src/lib/kprint/printk.c \
-			  src/gdt/gdt.c
+			  src/gdt/gdt.c \
+			  src/gdt/print_stack.c \
+			  src/lib/ansi/ansi.c
 LINKER		= src/kernel.ld
 
 INCLUDE_DIR	= src/kernel \
@@ -33,7 +35,8 @@ INCLUDE_DIR	= src/kernel \
 			  src/drivers/keyboard \
 			  src/drivers/serial \
 			  src/lib/kprint \
-			  src/gdt
+			  src/gdt \
+			  src/lib/ansi
 
 INCLUDE		= $(addprefix -I , $(INCLUDE_DIR))
 
