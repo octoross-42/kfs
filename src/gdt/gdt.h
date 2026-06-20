@@ -104,6 +104,9 @@ void	gdt_init_flat(void);
 void	gdt_flush(void);
 
 # include "kprint.h"
-void	print_kernel_stack(void);
+# include "ansi.h"
+
+uint32_t	get_esp(void);
+void		print_kernel_stack(void);
 
 #endif

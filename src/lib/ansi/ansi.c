@@ -10,11 +10,15 @@ static	void fill_code(char buf[32], enum ansi_code code, unsigned int *i)
 
 char	*ansi(enum ansi_code first, ...)
 {
-	static char			buf[32];
-	va_list			args;
+	static char			bufs[8][32];
+	static int			rotation = 0;
 
+	va_list			args;
 	unsigned int	i;
 	enum ansi_code	code;
+	
+	char *buf = bufs[rotation];
+	rotation = (rotation + 1) % 8;
 
 	if (first < 0)
 		return ((char *)0);
@@ -30,13 +34,14 @@ char	*ansi(enum ansi_code first, ...)
 	while (code >= 0)
 	{
 		buf[i ++] = ';';
+		fill_code(buf, code, &i);
 
 		code = va_arg(args, enum ansi_code);
-		fill_code(buf, code, &i);
 	}
+	
 	buf[i ++] = 'm';
 	buf[i] = '\0';
 	va_end(args);
-
+	
 	return (buf);
 }
