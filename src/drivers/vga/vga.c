@@ -4,14 +4,10 @@
 // 	-> buffer = grille de 80x25 = 2000 cellules
 // 	-> cellule = 16 bytes -> [octet 1: attribut -> [bg 4 bits, fg bits]] [octet 0: ascii] (little endian, mais on gere pas, le compilateur gere, visible depuis gdb)
 
-static size_t			vga_row = 0;
-static size_t			vga_column = 0;
-static enum vga_color	vga_fg = VGA_COLOR_DARK_GREY;
-static enum vga_color	vga_bg = VGA_COLOR_BLACK;
+// static enum vga_color	vga_fg = VGA_COLOR_DARK_GREY;
+// static enum vga_color	vga_bg = VGA_COLOR_BLACK;
 
-static uint16_t			alt_screen[VGA_WIDTH * VGA_HEIGHT];
-static size_t			alt_row = 0;
-static size_t			alt_column = 0;
+static screen_t			screens[NBR_SCREENS];
 
 static uint8_t			cursor_toggle = 1;
 static uint32_t			cursor_tick = 0;
@@ -264,4 +260,9 @@ void	vga_backspace(void)
 	vga_empty_at(vga_column + vga_row * VGA_WIDTH + 1);
 	
 	vga_goto(vga_column, vga_row);
+}
+
+void	vga_backspace_shell(void)
+{
+
 }

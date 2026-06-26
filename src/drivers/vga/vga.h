@@ -37,6 +37,19 @@ enum vga_color
 # define VGA_HEIGHT		25
 # define VGA_BUFFER_ADDRESS	0xB8000
 
+
+# define NBR_SCREENS 4
+
+typedef struct 
+{
+	uint16_t	entries[VGA_WIDTH * VGA_HEIGHT];
+	size_t		row;
+	size_t		col;
+	enum vga_color	fg;
+	enum vga_color	bg;
+}		screen_t;
+
+
 static inline uint16_t	vga_make_entry(char uc, enum vga_color fg, enum vga_color bg)
 {
 	return (uint16_t)(((bg << 4 | fg) << 8) | uc);
