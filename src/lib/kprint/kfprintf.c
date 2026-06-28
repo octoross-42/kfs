@@ -6,14 +6,37 @@
 /*   By: octoross <octoross@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/11 13:13:39 by octoross          #+#    #+#             */
-/*   Updated: 2026/06/12 18:34:52 by octoross         ###   ########.fr       */
+/*   Updated: 2026/06/28 20:03:51 by octoross         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "kprint.h"
 #include "serial.h"
 
-static void	uint32_base_aux(void (*write_char)(char), uint32_t n, const char *base, size_t len)
+static void write_char(int fd, char c)
+// 	-1				-> active screen
+// 0 - NBR_SCREENS	-> screen i
+// NBR_SCREENS		-> serial com 1
+{
+	if (fd < NBR_SCREENS)
+		return vga_write_char(c, fd);
+	if (fd == NBR_SCREENS)
+		return serial_write_char_com1(c);
+}
+
+
+static void write(int fd, char *s)
+// 	-1				-> active screen
+// 0 - NBR_SCREENS	-> screen i
+// NBR_SCREENS		-> serial com 1
+{
+	if (fd < NBR_SCREENS)
+		return vga_write(s, fd);
+	if (fd == NBR_SCREENS)
+		return serial_write_com1(s);
+}
+
+static void	uint32_base_aux(int fd, uint32_t n, const char *base, size_t len)
 {
 	// TTC - Trust The Caller
 	//		base != NULL	-> segfault sur strlen
@@ -21,33 +44,33 @@ static void	uint32_base_aux(void (*write_char)(char), uint32_t n, const char *ba
 	// 		len(base) > 1	-> infinite loop 
 
 	if (n >= len)
-		uint32_base_aux(write_char, n / len, base, len);
-	write_char(base[n % len]);
+		uint32_base_aux(fd, n / len, base, len);
+	write_char(fd, base[n % len]);
 }
 
-void	kfprint_uint32_base(void (*write_char)(char), uint32_t n, const char *base)
+void	kfprint_uint32_base(int fd, uint32_t n, const char *base)
 {	
-	uint32_base_aux(write_char, n, base, strlen(base));
+	uint32_base_aux(fd, n, base, strlen(base));
 }
 
-void	kfprint_uint32(void (*write_char)(char), uint32_t n)
+void	kfprint_uint32(int fd, uint32_t n)
 {
 	static const char * base = "0123456789";
-	kfprint_uint32_base(write_char, n, base);
+	kfprint_uint32_base(fd, n, base);
 }
 
-void	kfprint_int32(void (*write_char)(char), int32_t n)
+void	kfprint_int32(int fd, int32_t n)
 {
 	static const char * base = "0123456789";
 	if (n < 0)
 	{
-		write_char('-');
-		return kfprint_uint32_base(write_char, (uint32_t)-n, base);
+		write_char(fd, '-');
+		return kfprint_uint32_base(fd, (uint32_t)-n, base);
 	}
-	kfprint_uint32_base(write_char, (uint32_t)n, base);
+	kfprint_uint32_base(fd, (uint32_t)n, base);
 }
 
-void kfprint_uint32_padded(void (*write_char)(char), uint32_t n, const char *base, size_t padding)
+void kfprint_uint32_padded(int fd, uint32_t n, const char *base, size_t padding)
 {
     size_t  len = strlen(base);
     size_t  digits = 1;
@@ -61,53 +84,46 @@ void kfprint_uint32_padded(void (*write_char)(char), uint32_t n, const char *bas
 
     while (digits < padding)
     {
-        write_char(base[0]);	// padding
+    	write_char(fd, base[0]);	// padding
         padding--;
     }
-    kfprint_uint32_base(write_char, n, base);
+    kfprint_uint32_base(fd, n, base);
 }
 
-
-static void	write_with(void (*write_char)(char), const char *str)
-{
-	while (*str)
-		write_char(*(str ++));
-}
-
-static void	map_format(void (*write_char)(char), char c, va_list *ap, int *i)
+static void	map_format(int fd, char c, va_list *ap, int *i)
 {
 	if (c == 'c')
-		return write_char(va_arg(*ap, int));
+		return write_char(fd, va_arg(*ap, int));
 	if (c == 's')
 	{
 		char *str = va_arg(*ap, char *);
 		if (!str)
-			return write_with(write_char, "(null)");
-		return write_with(write_char, str);
+			return write(fd, "(null)");
+		return write(fd, str);
 	}
 	if (c == 'p')
 	{
-		write_with(write_char, "0x");
-		return kfprint_uint32_padded(write_char, va_arg(*ap, uint32_t), "0123456789abcdef", 8);
+		write(fd, "0x");
+		return kfprint_uint32_padded(fd, va_arg(*ap, uint32_t), "0123456789abcdef", 8);
 	}
 	if ((c == 'd') || (c == 'i'))
-		return kfprint_int32(write_char, va_arg(*ap, int32_t));
+		return kfprint_int32(fd, va_arg(*ap, int32_t));
 	if (c == 'u')
-		return kfprint_uint32(write_char, va_arg(*ap, uint32_t));
+		return kfprint_uint32(fd, va_arg(*ap, uint32_t));
 	if (c == 'x')
-		return kfprint_uint32_base(write_char, va_arg(*ap, uint32_t), "0123456789abcdef");
+		return kfprint_uint32_base(fd, va_arg(*ap, uint32_t), "0123456789abcdef");
 	if (c == 'X')
-		return kfprint_uint32_base(write_char, va_arg(*ap, uint32_t), "0123456789ABCDEF");
+		return kfprint_uint32_base(fd, va_arg(*ap, uint32_t), "0123456789ABCDEF");
 	if (c == '%')
-		return write_char('%');
+		return write_char(fd, '%');
 	(*i)--;
-	write_char('%');
+	write_char(fd, '%');
 }
 
-void	kfvprintf(void (*write_char)(char), const char *format, va_list ap)
+void	kfvprintf(int fd, const char *format, va_list ap)
 {
 	// TTC - Trust The Caller
-	// 		-> write_char adresse valide
+	// 		-> fd adresse valide
 	// 		-> format adresse valide
 	int	i;
 	
@@ -115,30 +131,21 @@ void	kfvprintf(void (*write_char)(char), const char *format, va_list ap)
 	while (format[i])
 	{
 		if (format[i] == '%')
-			map_format(write_char, format[++ i], &ap, &i);
+			map_format(fd, format[++ i], &ap, &i);
 		else
-			write_char(format[i]);
+			write_char(fd, format[i]);
 		i ++;
 	}
 }
 
-void	kfprintf(void (*write_char)(char), const char *format, ...)
+void	kfprintf(int fd, const char *format, ...)
 {
 	// TTC - Trust The Caller
-	// 		-> write_char adresse valide
+	// 		-> fd adresse valide
 	// 		-> format adresse valide
 	va_list	ap;
-	int	i;
-
+	
 	va_start(ap, format);
-	i = 0;
-	while (format[i])
-	{
-		if (format[i] == '%')
-			map_format(write_char, format[++ i], &ap, &i);
-		else
-			write_char(format[i]);
-		i ++;
-	}
+	kfvprintf(fd, format, ap);
 	va_end(ap);
 }

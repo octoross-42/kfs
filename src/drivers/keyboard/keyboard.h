@@ -3,6 +3,7 @@
 # define KEYBOARD_H
 
 # include "vga.h"
+# include "shell.h"
 
 static const char scancode_table[] = {
 	0,   0,  '1', '2', '3', '4', '5', '6',
@@ -19,6 +20,5 @@ void	active_keyboard(void);
 
 # define KEYBOARD_DATA_PORT		0x60
 # define KEYBOARD_STATUS_PORT	0x64
-
 
 #endif

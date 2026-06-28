@@ -35,14 +35,15 @@ enum vga_color
 
 # define VGA_WIDTH		80
 # define VGA_HEIGHT		25
-# define VGA_BUFFER_ADDRESS	0xB8000
-
+# define VGA_SIZE		VGA_WIDTH * VGA_HEIGHT
+# define VGA_BUFFER_ADDRESS		0xB8000
+# define VGA_CURSOR_TICKRATE	50000
 
 # define NBR_SCREENS 4
 
 typedef struct 
 {
-	uint16_t	entries[VGA_WIDTH * VGA_HEIGHT];
+	uint16_t	entries[VGA_SIZE];
 	size_t		row;
 	size_t		col;
 	enum vga_color	fg;
@@ -50,7 +51,7 @@ typedef struct
 }		screen_t;
 
 
-static inline uint16_t	vga_make_entry(char uc, enum vga_color fg, enum vga_color bg)
+static inline uint16_t	vga_make_entry(unsigned char uc, enum vga_color fg, enum vga_color bg)
 {
 	return (uint16_t)(((bg << 4 | fg) << 8) | uc);
 }
@@ -60,24 +61,30 @@ static inline uint16_t	vga_get_entry(size_t column, size_t row)
 	return (((uint16_t *)VGA_BUFFER_ADDRESS)[row * VGA_WIDTH + column]);
 }
 
-static inline void	vga_write_entry_at(uint16_t entry, size_t index)
-{
-	((uint16_t *)VGA_BUFFER_ADDRESS)[index] = entry;
-}
+void	vga_draw_entry_on(int screen_nbr, uint16_t entry, size_t index);
+void	vga_draw_char_on(int screen_nbr, char c, size_t index);
+void	vga_write(char *str, int screen_nbr);
+void	vga_write_char(char uc, int screen_nbr);
 
-void	vga_write(char *str);
-void	vga_write_char(char uc);
-
+void	vga_line_scroll(screen_t *screen);
+void	shell_line_scroll(screen_t *screen);
 void	vga_backspace(void);
+int		vga_backspace_shell(void);
 
+size_t	vga_get_row(int screen_nbr);
+size_t	vga_get_col(int screen_nbr);
 void	vga_goto(size_t column, size_t row);
 
-void	vga_change_fg(enum vga_color fg);
-void	vga_change_bg(enum vga_color bg);
+void	vga_change_fg(enum vga_color fg, int screen_nbr);
+void	vga_change_bg(enum vga_color bg, int screen_nbr);
+enum vga_color	vga_get_fg(int screen_nbr);
+enum vga_color	vga_get_bg(int screen_nbr);
 
-void	vga_switch_screen(void);
-void	vga_init_screens(void);
-void	vga_clear_screen(uint16_t *screen);
+void	vga_init_screen(unsigned int screen_nbr);
+void	vga_clear_screen(int screen_nbr);
+
+void	vga_next_screen(void);
+void	vga_prev_screen(void);
 
 # define CURSOR_CHAR	0xDB		// bloc plein
 // # define CURSOR_CHAR	'_'
@@ -87,5 +94,6 @@ void	vga_reset_cursor(void);
 void	vga_tick_cursor(void);
 
 # include "kprint.h"
+# include "shell.h"
 
 #endif
