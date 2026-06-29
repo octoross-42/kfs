@@ -139,7 +139,7 @@ static void	vga_empty_at(screen_t *screen, size_t index)
 
 void	vga_draw_cursor(void)
 {
-	vga_draw_char_on(active - screens, CURSOR_CHAR, active->row * VGA_WIDTH + active->col);
+	// vga_draw_char_on(active - screens, CURSOR_CHAR, active->row * VGA_WIDTH + active->col);
 }
 
 void	vga_reset_cursor(void)

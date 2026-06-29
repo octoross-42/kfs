@@ -92,14 +92,14 @@ $(IMAGE): $(NAME)
 	mkdir -p iso/boot/grub
 	cp $(NAME) iso/boot/
 	echo 'set timeout=0\nset default=0\nmenuentry "octor-os" { multiboot /boot/$(NAME)\nboot }' > iso/boot/grub/grub.cfg
-	grub-mkrescue -o $(IMAGE) iso/
+	grub2-mkrescue -o $(IMAGE) iso/
 
 # ───────────────────────────────────────────────────────────────
 # Run
 
 # run with kernel elf, not img, dev
 run-dev: ${NAME}
-	qemu-system-i386 -kernel ${NAME}
+	qemu-system-i386 -kernel ${NAME} -serial stdio
 
 kvm-perms:
 	sudo chmod 666 /dev/kvm

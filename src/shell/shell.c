@@ -6,6 +6,9 @@ shell_t			*active_shell = &shells[0];
 void	shell_write_char(char c, int screen_nbr)
 {
 	shell_t	*shell;
+
+	if (c == '\n')
+		
 	if (screen_nbr < 0)
 		shell = active_shell;
 	else
@@ -75,7 +78,6 @@ static void	init_shell_screen(size_t screen_nbr)
 {
 	size_t		i;
 	
-	printk("init shell %d\n", screen_nbr);
 	shells[screen_nbr].buffer_i = 0;
 	vga_init_screen(screen_nbr);
 	i = 0;
@@ -93,10 +95,10 @@ static void	init_shell_screen(size_t screen_nbr)
 	kfprintf(screen_nbr, utf8_to_cp437("                █              ▄▄       █\n"));
 	kfprintf(screen_nbr, utf8_to_cp437("                 ▀▀▄▄          %s▀%s▀      ▄▀\n"), ansi(CYANFG, END), ansi(LGREYFG, END));
 	kfprintf(screen_nbr, utf8_to_cp437("                 ▄▀  ▄▀▄▄▄          ▄▄▄▀\n"));
-	kfprintf(screen_nbr, utf8_to_cp437("                  ▀▀▀     ▀▀▀▀▀▀▀▀▀▀\n\n"));
-	kfprintf(screen_nbr, utf8_to_cp437("    █ ▄▄▀▀  █▀▀▀▀▀ ▄▀▀▀▀▀\n"));
-	kfprintf(screen_nbr, utf8_to_cp437("    █▀  ▀▄  █▀▀▀▀   ▀▀▀▀▄\n"));
-	kfprintf(screen_nbr, utf8_to_cp437("    ▀    ▀  ▀      ▀▀▀▀▀▀\n"));
+	kfprintf(screen_nbr, utf8_to_cp437("                  ▀▀▀     ▀▀▀▀▀▀▀▀▀▀\n\n\n"));
+	kfprintf(screen_nbr, utf8_to_cp437("                 █ ▄▄▀▀  █▀▀▀▀▀ ▄▀▀▀▀▀\n"));
+	kfprintf(screen_nbr, utf8_to_cp437("                 █▀  ▀▄  █▀▀▀▀   ▀▀▀▀▄\n"));
+	kfprintf(screen_nbr, utf8_to_cp437("                 ▀    ▀  ▀      ▀▀▀▀▀▀\n"));
 	kfprintf(screen_nbr, utf8_to_cp437("    ──────────────────────────────────────────────────\n"));
 	kfprintf(screen_nbr, utf8_to_cp437("    %sBy: ebouvier                          By: octoross%s\n\n"),
 		ansi(YELLOWFG, END), ansi(RESET, END));
@@ -105,8 +107,6 @@ static void	init_shell_screen(size_t screen_nbr)
 	
 	shells[screen_nbr].col = vga_get_col(screen_nbr);
 	shells[screen_nbr].row = vga_get_row(screen_nbr);
-
-	printk("init %d buffer i %d\n", screen_nbr, shells[screen_nbr].buffer_i);
 }
 
 void	init_shells(void)

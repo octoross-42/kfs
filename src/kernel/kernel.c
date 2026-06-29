@@ -2,8 +2,8 @@
 
 void	kernel_main(void *mboot_ptr)
 {
-	init_shells();
 	serial_init_com1();
+	init_shells();
 
 	print_multiboot_data(mboot_ptr);
 	print_kernel_stack();
