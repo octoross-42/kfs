@@ -26,8 +26,6 @@ void	init_shells(void);
 void	shell_write_char(char c, int screen_nbr);
 void	shell_backspace(void);
 
-void	shell_prompt(unsigned int screen_nbr);
-
 void	init_shells(void);
 
 #endif
