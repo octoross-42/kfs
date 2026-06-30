@@ -6,7 +6,7 @@
 /*   By: octoross <octoross@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/11 13:13:39 by octoross          #+#    #+#             */
-/*   Updated: 2026/06/28 20:03:51 by octoross         ###   ########.fr       */
+/*   Updated: 2026/06/30 15:31:59 by octoross         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static void write_char(int fd, char c)
 // NBR_SCREENS		-> serial com 1
 {
 	if (fd < NBR_SCREENS)
-		return vga_write_char(c, fd);
+		return vga_write_char(fd, c);
 	if (fd == NBR_SCREENS)
 		return serial_write_char_com1(c);
 }
@@ -31,7 +31,7 @@ static void write(int fd, char *s)
 // NBR_SCREENS		-> serial com 1
 {
 	if (fd < NBR_SCREENS)
-		return vga_write(s, fd);
+		return vga_write(fd, s);
 	if (fd == NBR_SCREENS)
 		return serial_write_com1(s);
 }
