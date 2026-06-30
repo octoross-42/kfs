@@ -131,9 +131,10 @@ static inline void	vga_empty_at(screen_t *screen, size_t index)
 	vga_draw_char_on(screen, 0, index);
 }
 
-inline void	vga_draw_cursor(void)
+void	vga_draw_cursor(void)
 {
-	vga_draw_char_on(active, CURSOR_CHAR, active->row * VGA_WIDTH + active->col);
+	static const uint16_t entry = (uint16_t)(((VGA_COLOR_BLACK << 4 | VGA_COLOR_LIGHT_GREY) << 8) | CURSOR_CHAR);
+	vga_draw_entry_on(active, entry, active->row * VGA_WIDTH + active->col);
 }
 
 inline void	vga_reset_cursor(void)

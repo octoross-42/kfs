@@ -151,3 +151,23 @@ void	init_shells(void)
 	while (i < NBR_SCREENS)
 		init_shell_screen(i ++);
 }
+
+void	shell_next_screen(void)
+{
+	if (active_shell == shells + NBR_SCREENS - 1)
+		active_shell = shells;
+	else
+		active_shell ++;
+
+	vga_next_screen();
+}
+
+void	shell_prev_screen(void)
+{
+	if (active_shell == shells)
+		active_shell = shells + NBR_SCREENS - 1;
+	else
+		active_shell --;
+
+	vga_prev_screen();
+}

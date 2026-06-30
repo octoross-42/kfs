@@ -37,7 +37,7 @@ enum vga_color
 # define VGA_HEIGHT		25
 # define VGA_SIZE		VGA_WIDTH * VGA_HEIGHT
 # define VGA_BUFFER_ADDRESS		0xB8000
-# define VGA_CURSOR_TICKRATE	10000000
+# define VGA_CURSOR_TICKRATE	20000
 
 # define NBR_SCREENS 4
 

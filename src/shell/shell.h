@@ -28,4 +28,8 @@ void	shell_backspace(void);
 
 void	init_shells(void);
 
+void	shell_next_screen(void);
+void	shell_prev_screen(void);
+
+
 #endif

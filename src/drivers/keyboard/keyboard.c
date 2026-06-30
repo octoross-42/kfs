@@ -32,10 +32,15 @@ void	active_keyboard(void)
 			ctrl_pressed = 0;
 			c = 0;
 		}
-		else if ((sc == 0x4D) || (sc == 0x4B)) // fleche droite ou gauche
+		else if (sc == 0x4D)
 		{	
 			if (ctrl_pressed)
-				vga_next_screen();
+				shell_next_screen();
+		}
+		else if (sc == 0x4B)
+		{
+			if (ctrl_pressed)
+				shell_prev_screen();
 		}
 		else
 		{
