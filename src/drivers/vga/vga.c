@@ -25,35 +25,33 @@ enum vga_color	vga_get_bg(int screen_nbr) { if (screen_nbr < 0) return (active->
 size_t	vga_get_row(int screen_nbr) { if (screen_nbr < 0) return (active->row); return (screens[screen_nbr].row); }
 size_t	vga_get_col(int screen_nbr) { if (screen_nbr < 0) return (active->col); return (screens[screen_nbr].col); }
 
-void	vga_draw_entry_on(int screen_nbr, uint16_t entry, size_t index)
+static screen_t	*get_screen(int screen_nbr)
 {
-	screen_t	*screen;
-
 	if (screen_nbr < 0)
-		screen = active;
+		return (active);
 	else
-		screen = &screens[screen_nbr];
+		return (&screens[screen_nbr]);	
+}
+
+static void	vga_draw_entry_on(screen_t *screen, uint16_t entry, size_t index)
+{
 	if (screen == active)
 		((uint16_t *)VGA_BUFFER_ADDRESS)[index] = entry;
 	screen->entries[index] = entry;
 }
 
-void	vga_draw_char_on(int screen_nbr, char c, size_t index)
+static void	vga_draw_char_on(screen_t *screen, char c, size_t index)
 {
-	screen_t	*screen;
 	uint16_t	entry;
 
-	if (screen_nbr < 0)
-		screen = active;
-	else
-		screen = &screens[screen_nbr];
 	entry = vga_make_entry((unsigned char)c, screen->fg, screen->bg);
 	if (screen == active)
 		((uint16_t *)VGA_BUFFER_ADDRESS)[index] = entry;
 	screen->entries[index] = entry;
 }
 
-static void	apply_ansi_code(unsigned int code, int screen_nbr)
+
+static void	apply_ansi_code(int screen_nbr, unsigned int code)
 {
 	screen_t	*screen;
 	enum vga_color bg;
@@ -102,7 +100,7 @@ static void	apply_ansi_code(unsigned int code, int screen_nbr)
 	return ;
 }
 
-static unsigned int	apply_ansi(char *str, int screen_nbr)
+static unsigned int	apply_ansi(int screen_nbr, char *str)
 {
 	unsigned int i = 0;
 	unsigned int code = 0;
@@ -112,12 +110,12 @@ static unsigned int	apply_ansi(char *str, int screen_nbr)
 			code = code * 10 + (str[i] - '0');
 		else if (str[i] == ';')
 		{
-			apply_ansi_code(code, screen_nbr);
+			apply_ansi_code(screen_nbr, code);
 			code = 0;
 		}
 		else if (str[i] == 'm')
 		{
-			apply_ansi_code(code, screen_nbr);
+			apply_ansi_code(screen_nbr, code);
 			return (i + 1);
 		}
 		else
@@ -128,17 +126,17 @@ static unsigned int	apply_ansi(char *str, int screen_nbr)
 }
 
 
-static void	vga_empty_at(screen_t *screen, size_t index)
+static inline void	vga_empty_at(screen_t *screen, size_t index)
 {
-	vga_draw_char_on(screen - screens, 0, index);
+	vga_draw_char_on(screen, 0, index);
 }
 
-void	vga_draw_cursor(void)
+inline void	vga_draw_cursor(void)
 {
-	// vga_draw_char_on(active - screens, CURSOR_CHAR, active->row * VGA_WIDTH + active->col);
+	vga_draw_char_on(active, CURSOR_CHAR, active->row * VGA_WIDTH + active->col);
 }
 
-void	vga_reset_cursor(void)
+inline void	vga_reset_cursor(void)
 {
 	cursor_tick = 0;
 	vga_draw_cursor();
@@ -155,7 +153,7 @@ void	vga_set_cursor(size_t column, size_t row)
 	vga_reset_cursor();
 }
 
-void	vga_toggle_cursor(void)
+static void	vga_toggle_cursor(void)
 {
 	cursor_tick = 0;
 	if (cursor_toggle)
@@ -188,7 +186,7 @@ void	vga_line_scroll(screen_t *screen)
 		column = 0;
 		while (column < VGA_WIDTH)
 		{
-			vga_draw_entry_on(screen - screens, vga_get_entry(column, row + 1), row * VGA_WIDTH + column);
+			vga_draw_entry_on(screen, vga_get_entry(column, row + 1), row * VGA_WIDTH + column);
 			column ++;
 		}
 		row ++;
@@ -197,7 +195,6 @@ void	vga_line_scroll(screen_t *screen)
 	while (column < VGA_WIDTH)
 		vga_empty_at(screen, row * VGA_WIDTH + (column ++));
 }
-
 
 void	shell_line_scroll(screen_t *screen)
 {
@@ -215,7 +212,7 @@ void	shell_line_scroll(screen_t *screen)
 		column = 0;
 		while (column < VGA_WIDTH)
 		{
-			vga_draw_entry_on(screen - screens, vga_get_entry(column, row + 1), row * VGA_WIDTH + column);		
+			vga_draw_entry_on(screen, vga_get_entry(column, row + 1), row * VGA_WIDTH + column);		
 			column ++;
 		}
 		row ++;
@@ -225,16 +222,8 @@ void	shell_line_scroll(screen_t *screen)
 		vga_empty_at(screen, row * VGA_WIDTH + (column ++));
 }
 
-
-void	vga_write_char(char c, int screen_nbr)
+void	vga_write_char_no_cursor(screen_t *screen, char c)
 {
-	screen_t	*screen;
-
-	if (screen_nbr < 0)
-		screen = active;
-	else
-		screen = &screens[screen_nbr];
-	
 	if (c == '\n')
 	{
 		vga_empty_at(screen, screen->col + screen->row * VGA_WIDTH);			// erase cursor, if not newline will get replaced by the new char we're writing
@@ -244,12 +233,10 @@ void	vga_write_char(char c, int screen_nbr)
 			shell_line_scroll(screen);
 		else
 			screen->row ++;
-		if (screen == active)
-			vga_set_cursor(screen->col, screen->row);
 		return ;
 	}
 
-	vga_draw_char_on(screen_nbr, c, screen->row * VGA_WIDTH + (screen->col ++));
+	vga_draw_char_on(screen, c, screen->row * VGA_WIDTH + (screen->col ++));
 
 	if (screen->col == VGA_WIDTH)
 	{
@@ -258,28 +245,41 @@ void	vga_write_char(char c, int screen_nbr)
 			shell_line_scroll(screen);
 		else
 			screen->row ++;
-		
 	}
+}
+
+
+void	vga_write_char(int screen_nbr, char c)
+{
+	screen_t	*screen;
+
+	screen = get_screen(screen_nbr);
+	vga_write_char_no_cursor(screen, c);
 	if (screen == active)
 		vga_set_cursor(active->col, active->row);
 }
 
-void	vga_write(char *str, int screen_nbr)
+void	vga_write(int screen_nbr, char *str)
 {
-	unsigned int i;
+	unsigned int	i;
+	screen_t		*screen;
 
+	screen = get_screen(screen_nbr);
 	while (* str)
 	{
 		if (*str == '\033')
 		{
 			if (*(++ str) != '[')	// check si ansi code
 				continue ;
-			i = apply_ansi(++str, screen_nbr);
+			i = apply_ansi(screen_nbr, ++str);
 			str += i;
 		}
 		else
-			vga_write_char(*(str ++), screen_nbr);
+			vga_write_char_no_cursor(screen, *(str ++));
 	}
+	
+	if (screen == active)
+		vga_set_cursor(active->col, active->row);
 }
 
 void	vga_goto(size_t column, size_t row)
@@ -292,10 +292,12 @@ void	vga_goto(size_t column, size_t row)
 void	vga_clear_screen(int screen_nbr)
 {
 	size_t		i;
+	screen_t	*screen;
 
 	i = 0;
+	screen = get_screen(screen_nbr);
 	while (i < VGA_SIZE)
-		vga_draw_char_on(screen_nbr, ' ', i ++);
+		vga_draw_char_on(screen, ' ', i ++);
 }
 
 void	vga_init_screen(unsigned int screen_nbr)
@@ -316,7 +318,7 @@ static void vga_refresh_screen(void)
 	
 	i = -1;
 	while (++ i < VGA_SIZE)
-		vga_draw_entry_on(active - screens, active->entries[i], i);
+		vga_draw_entry_on(active, active->entries[i], i);
 	vga_goto(active->col, active->row);
 }
 

@@ -61,10 +61,8 @@ static inline uint16_t	vga_get_entry(size_t column, size_t row)
 	return (((uint16_t *)VGA_BUFFER_ADDRESS)[row * VGA_WIDTH + column]);
 }
 
-void	vga_draw_entry_on(int screen_nbr, uint16_t entry, size_t index);
-void	vga_draw_char_on(int screen_nbr, char c, size_t index);
-void	vga_write(char *str, int screen_nbr);
-void	vga_write_char(char uc, int screen_nbr);
+void	vga_write(int screen_nbr, char *str);
+void	vga_write_char(int screen_nbr, char c);
 
 void	vga_line_scroll(screen_t *screen);
 void	shell_line_scroll(screen_t *screen);
@@ -89,7 +87,6 @@ void	vga_prev_screen(void);
 # define CURSOR_CHAR	0xDB		// bloc plein
 // # define CURSOR_CHAR	'_'
 void	vga_draw_cursor(void);
-void	vga_toggle_cursor(void);
 void	vga_reset_cursor(void);
 void	vga_tick_cursor(void);
 
