@@ -19,13 +19,13 @@ NASM_SRC	= src/boot/boot.s \
 
 C_SRC		= src/kernel/kernel.c \
 			  src/kernel/print_multiboot_data.c \
+			  src/gdt/gdt.c \
+			  src/gdt/print_stack.c \
 			  src/drivers/vga/vga.c \
 			  src/drivers/keyboard/keyboard.c \
 			  src/drivers/serial/serial_com1.c \
 			  src/lib/kprint/kfprintf.c \
 			  src/lib/kprint/printk.c \
-			  src/gdt/gdt.c \
-			  src/gdt/print_stack.c \
 			  src/lib/ansi/ansi.c \
 			  src/shell/shell.c
 
@@ -106,7 +106,7 @@ run-dev: ${NAME}
 	qemu-system-i386 -kernel ${NAME} -serial stdio
 
 kvm-perms:
-	sudo chmod +x /dev/kvm
+	sudo chmod 666 /dev/kvm
 
 # run with KVM and os img
 run: $(IMAGE)
