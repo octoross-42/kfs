@@ -14,7 +14,9 @@ ASMFLAGS	= -f elf32
 NASM_SRC	= src/boot/boot.s \
 			  src/drivers/io/io.s \
 			  src/lib/string/strlen.s \
+			  src/lib/string/strncmp.s \
 			  src/gdt/lgdt.s
+
 C_SRC		= src/kernel/kernel.c \
 			  src/kernel/print_multiboot_data.c \
 			  src/drivers/vga/vga.c \
@@ -26,7 +28,6 @@ C_SRC		= src/kernel/kernel.c \
 			  src/gdt/print_stack.c \
 			  src/lib/ansi/ansi.c \
 			  src/shell/shell.c
-LINKER		= src/kernel.ld
 
 INCLUDE_DIR	= src/kernel \
 			  src/lib	\
@@ -40,6 +41,9 @@ INCLUDE_DIR	= src/kernel \
 			  src/lib/ansi \
 			  src/shell
 
+LINKER		= src/kernel.ld
+
+
 INCLUDE		= $(addprefix -I , $(INCLUDE_DIR))
 
 BUILD		= build
@@ -47,8 +51,8 @@ NASM_OBJ	= $(patsubst src/%.s,$(BUILD)/%.o,$(NASM_SRC))
 C_OBJ   	= $(patsubst src/%.c,$(BUILD)/%.o,$(C_SRC))
 OBJS 		= ${NASM_OBJ} ${C_OBJ}
 
-NAME		= octor-os-kfs-1.elf
-IMAGE 		= octor-os-kfs-1.iso
+NAME		= octor-os-kfs.elf
+IMAGE 		= octor-os-kfs.iso
 
 # ───────────────────────────────────────────────────────────────
 # Colors, format
@@ -92,7 +96,7 @@ $(IMAGE): $(NAME)
 	mkdir -p iso/boot/grub
 	cp $(NAME) iso/boot/
 	echo 'set timeout=0\nset default=0\nmenuentry "octor-os" { multiboot /boot/$(NAME)\nboot }' > iso/boot/grub/grub.cfg
-	grub2-mkrescue -o $(IMAGE) iso/
+	grub-mkrescue -o $(IMAGE) iso/
 
 # ───────────────────────────────────────────────────────────────
 # Run
@@ -102,7 +106,7 @@ run-dev: ${NAME}
 	qemu-system-i386 -kernel ${NAME} -serial stdio
 
 kvm-perms:
-	sudo chmod 666 /dev/kvm
+	sudo chmod +x /dev/kvm
 
 # run with KVM and os img
 run: $(IMAGE)

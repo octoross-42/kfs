@@ -35,10 +35,7 @@ void	vga_draw_entry_on(int screen_nbr, uint16_t entry, size_t index)
 		screen = &screens[screen_nbr];
 	if (screen == active)
 		((uint16_t *)VGA_BUFFER_ADDRESS)[index] = entry;
-	if (index >= VGA_SIZE)
-		printk("we miscalulated %d\n", index);
-	else
-		screen->entries[index] = entry;
+	screen->entries[index] = entry;
 }
 
 void	vga_draw_char_on(int screen_nbr, char c, size_t index)
@@ -55,7 +52,6 @@ void	vga_draw_char_on(int screen_nbr, char c, size_t index)
 		((uint16_t *)VGA_BUFFER_ADDRESS)[index] = entry;
 	screen->entries[index] = entry;
 }
-
 
 static void	apply_ansi_code(unsigned int code, int screen_nbr)
 {

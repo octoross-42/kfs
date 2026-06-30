@@ -3,12 +3,17 @@
 shell_t			shells[NBR_SCREENS];
 shell_t			*active_shell = &shells[0];
 
+void	shell_enter_cmd(void)
+{
+	printk("cmd %s\n", active_shell->buffer);
+}
+
 void	shell_write_char(char c, int screen_nbr)
 {
 	shell_t	*shell;
 
 	if (c == '\n')
-		
+		shell_enter_cmd();
 	if (screen_nbr < 0)
 		shell = active_shell;
 	else

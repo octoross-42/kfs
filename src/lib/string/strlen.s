@@ -1,7 +1,5 @@
 section .text
     global strlen
-	global false_strlen
-
 
 strlen:
 ; 	TTC: Trust The Caller
