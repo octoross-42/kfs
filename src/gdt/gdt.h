@@ -107,6 +107,6 @@ void	gdt_flush(void);
 # include "ansi.h"
 
 uint32_t	get_esp(void);
-void		print_kernel_stack(void);
+void		print_kernel_stack(int fd);
 
 #endif
