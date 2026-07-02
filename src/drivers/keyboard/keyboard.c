@@ -46,7 +46,7 @@ void	active_keyboard(void)
 		{
 			c = scancode_to_ascii(sc);
 			if (c)
-				shell_write_char(c, -1);
+				shell_write_char(-1, c);
 		}
 	}
 }

@@ -19,30 +19,64 @@ static void	shell_prompt(shell_t *shell)
 	screen_nbr = shell - shells;
 	fg = vga_get_fg(screen_nbr);
 	bg = vga_get_bg(screen_nbr);
-	vga_change_fg(VGA_COLOR_CYAN, screen_nbr);
-	vga_change_bg(VGA_COLOR_BLACK, screen_nbr);
+	vga_change_fg(screen_nbr, VGA_COLOR_CYAN);
+	vga_change_bg(screen_nbr, VGA_COLOR_BLACK);
 	
 	vga_write(screen_nbr, SHELL_PROMPT);
 	
 	shell->col = vga_get_col(screen_nbr);
 	shell->row = vga_get_row(screen_nbr);
 	
-	vga_change_fg(fg, screen_nbr);
-	vga_change_bg(bg, screen_nbr);
+	vga_change_fg(screen_nbr, fg);
+	vga_change_bg(screen_nbr, bg);
 }
 
+static inline int	contains_cmd(char *str, char *cmd, size_t cmd_len)
+{
+	return (!strncmp(str, cmd, cmd_len) && ((str[cmd_len] == '\0') || isspace(str[cmd_len])));
+}
 
-// static void	shell_no_heap_cmd(char cmd_buffer[SHELL_BUFFER_LEN])
-// {
-	
-// }
+static void	isolate_first_word(char *s)
+{
+	while (*s)
+	{
+		if (isspace(*s))
+		{
+			*s = '\0';
+			return ;
+		}
+		s ++;
+	}
+}
+
+static void	shell_no_heap_cmd(shell_t *shell)
+{
+	char			*cmd_buffer;
+
+	cmd_buffer = shell->buffer;
+	while (*cmd_buffer == ' ')
+		cmd_buffer ++;
+	if (!*cmd_buffer)
+		return ;
+	if (contains_cmd(cmd_buffer, "printks", 7))
+	{
+		print_kernel_stack(shell - shells);
+		print_kernel_stack(NBR_SCREENS);
+	}
+	else
+	{
+		isolate_first_word(cmd_buffer);
+		kfprintf(shell - shells, "%s: command not found\n", cmd_buffer);
+	}
+}
 
 void	shell_enter_cmd(shell_t *shell)
 {
 	size_t			i;
 
-	printk("cmd '%s'\n", shell->buffer);
-	// shell_no_heap_cmd(shell->buffer);
+	if (!*(shell->buffer))
+		return shell_prompt(shell);
+	shell_no_heap_cmd(shell);
 
 	i = 0;
 	while (i < shell->buffer_i)
@@ -51,7 +85,7 @@ void	shell_enter_cmd(shell_t *shell)
 	shell_prompt(shell);
 }
 
-void	shell_write_char(char c, int screen_nbr)
+void	shell_write_char(int screen_nbr, char c)
 {
 	shell_t	*shell;
 
@@ -60,13 +94,20 @@ void	shell_write_char(char c, int screen_nbr)
 	else
 		shell = &shells[screen_nbr];
 	
-	if ((c == '\n') && ((shell->buffer_i == 0) || (shell->buffer[shell->buffer_i - 1] != '\\')))
+	if ((shell->buffer_i > 0) && (shell->buffer[shell->buffer_i - 1] == '\\') && (c == '\n'))
+	{
+		shell->buffer[shell->buffer_i - 1] = '\n';
+		return vga_write_char(screen_nbr, '\n');;
+	}
+
+	if (c == '\n')
 	{
 		vga_write_char(screen_nbr, c);
 		return shell_enter_cmd(shell);
 	}
 	if (shell->buffer_i >= SHELL_BUFFER_LEN)
 		return ;
+
 	shell->buffer[shell->buffer_i ++] = c;
 	vga_write_char(screen_nbr, c);
 }

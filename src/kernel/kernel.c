@@ -6,7 +6,7 @@ void	kernel_main(void *mboot_ptr)
 	init_shells();
 
 	print_multiboot_data(mboot_ptr);
-	print_kernel_stack();
+	print_kernel_stack(NBR_SCREENS);
 
 	active_keyboard();
 }

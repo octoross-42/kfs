@@ -30,15 +30,16 @@ C_SRC		= src/kernel/kernel.c \
 			  src/shell/shell.c
 
 INCLUDE_DIR	= src/kernel \
-			  src/lib	\
-			  src/lib/string \
 			  src/drivers/io \
 			  src/drivers/vga \
 			  src/drivers/keyboard \
 			  src/drivers/serial \
 			  src/lib/kprint \
 			  src/gdt \
+			  src/lib	\
+			  src/lib/string \
 			  src/lib/ansi \
+			  src/lib/ctype \
 			  src/shell
 
 LINKER		= src/kernel.ld

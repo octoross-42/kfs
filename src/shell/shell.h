@@ -4,6 +4,8 @@
 # include "types.h"
 # include "vga.h"
 # include "ansi.h"
+# include "gdt.h"
+# include "ctype.h"
 
 # define SHELL_BUFFER_LEN 128
 
@@ -23,7 +25,7 @@ typedef struct
 
 void	init_shells(void);
 
-void	shell_write_char(char c, int screen_nbr);
+void	shell_write_char(int screen_nbr, char c);
 void	shell_backspace(void);
 
 void	init_shells(void);
