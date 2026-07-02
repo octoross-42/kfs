@@ -41,6 +41,9 @@ enum vga_color
 
 # define NBR_SCREENS 4
 
+# define VGA_RESET_FG	VGA_COLOR_LIGHT_GREY
+# define VGA_RESET_BG	VGA_COLOR_BLACK
+
 typedef struct 
 {
 	uint16_t	entries[VGA_SIZE];
@@ -73,8 +76,8 @@ size_t	vga_get_row(int screen_nbr);
 size_t	vga_get_col(int screen_nbr);
 void	vga_goto(size_t column, size_t row);
 
-void	vga_change_fg(enum vga_color fg, int screen_nbr);
-void	vga_change_bg(enum vga_color bg, int screen_nbr);
+void	vga_change_fg(int screen_nbr, enum vga_color fg);
+void	vga_change_bg(int screen_nbr, enum vga_color bg);
 enum vga_color	vga_get_fg(int screen_nbr);
 enum vga_color	vga_get_bg(int screen_nbr);
 

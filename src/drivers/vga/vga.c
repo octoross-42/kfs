@@ -16,8 +16,8 @@ static uint32_t			cursor_tick = 0;
 extern shell_t			shells[NBR_SCREENS];
 extern shell_t			*active_shell;
 
-void	vga_change_fg(enum vga_color fg, int screen_nbr) { if (screen_nbr < 0) active->fg = fg; else screens[screen_nbr].fg = fg; }
-void	vga_change_bg(enum vga_color bg, int screen_nbr) { if (screen_nbr < 0) active->bg = bg; else screens[screen_nbr].bg = bg; }
+void	vga_change_fg(int screen_nbr, enum vga_color fg) { if (screen_nbr < 0) active->fg = fg; else screens[screen_nbr].fg = fg; }
+void	vga_change_bg(int screen_nbr, enum vga_color bg) { if (screen_nbr < 0) active->bg = bg; else screens[screen_nbr].bg = bg; }
 
 enum vga_color	vga_get_fg(int screen_nbr) { if (screen_nbr < 0) return (active->fg); return (screens[screen_nbr].fg); }
 enum vga_color	vga_get_bg(int screen_nbr) { if (screen_nbr < 0) return (active->bg); return (screens[screen_nbr].bg); }
@@ -70,15 +70,15 @@ static void	apply_ansi_code(int screen_nbr, unsigned int code)
 
 	if (code == 0)
 	{
-		vga_change_fg(VGA_COLOR_DARK_GREY, screen_nbr);
-		return vga_change_bg(VGA_COLOR_BLACK, screen_nbr);
+		vga_change_fg(screen_nbr, VGA_RESET_FG);
+		return vga_change_bg(screen_nbr, VGA_RESET_BG);
 	}
 	if (code == 1)						// bold
-		return vga_change_fg(active->fg | 0b1000, screen_nbr);	// bit 3 = bit d'intensité
+		return vga_change_fg(screen_nbr, active->fg | 0b1000);	// bit 3 = bit d'intensité
 	if ((code == 2) || (code == 22))	// dim
-		return vga_change_fg(active->fg & 0b0111, screen_nbr);	// bit 3 = bit d'intensité
+		return vga_change_fg(screen_nbr, active->fg & 0b0111);	// bit 3 = bit d'intensité
 	if (code == 5)						// blink ?
-		return vga_change_bg(active->bg | 0b1000, screen_nbr);	// bit 7 = bit de blink (entry = bg (4bits) + fg (4bits) + c (8 bits)), pour styliser -> 8 bits
+		return vga_change_bg(screen_nbr, active->bg | 0b1000);	// bit 7 = bit de blink (entry = bg (4bits) + fg (4bits) + c (8 bits)), pour styliser -> 8 bits
 	if (code == 7)						// reverse
 	{
 		if (screen_nbr < 0)
@@ -86,17 +86,17 @@ static void	apply_ansi_code(int screen_nbr, unsigned int code)
 		else
 			screen = &screens[screen_nbr];
 		bg = screen->bg;	
-		vga_change_bg(screen->fg, screen_nbr);
-		return vga_change_fg(bg, screen_nbr);
+		vga_change_bg(screen_nbr, screen->fg);
+		return vga_change_fg(screen_nbr, bg);
 	}
 	if ((30 <= code) && (code <= 37))
-		return vga_change_fg(ansi_to_vga[code - 30], screen_nbr);
+		return vga_change_fg(screen_nbr, ansi_to_vga[code - 30]);
 	if ((40 <= code) && code <= 47)
-		return vga_change_bg(ansi_to_vga[code - 40], screen_nbr);
+		return vga_change_bg(screen_nbr, ansi_to_vga[code - 40]);
 	if ((90 <= code) && (code <= 97))
-		return vga_change_fg(ansi_to_vga[code - 90] + 8, screen_nbr);
+		return vga_change_fg(screen_nbr, ansi_to_vga[code - 90] + 8);
 	if ((100 <= code) && code <= 107)
-		return vga_change_bg(ansi_to_vga[code - 100] + 8, screen_nbr);
+		return vga_change_bg(screen_nbr, ansi_to_vga[code - 100] + 8);
 	return ;
 }
 
@@ -307,8 +307,8 @@ void	vga_init_screen(unsigned int screen_nbr)
 
 	vga_clear_screen(screen_nbr);
 	screen = &screens[screen_nbr];
-	screen->fg = VGA_COLOR_DARK_GREY;
-	screen->bg = VGA_COLOR_BLACK;
+	screen->fg = VGA_RESET_FG;
+	screen->bg = VGA_RESET_BG;
 	screen->col = 0;
 	screen->row = 0;
 }
