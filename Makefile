@@ -120,11 +120,17 @@ run: $(IMAGE)
 
 run-debug: $(IMAGE)
 	gdb qemu-system-i386 \
-		-s -S
+		-s -S \
 		-drive file=$(IMAGE),format=raw \
 		-enable-kvm \
 		-m 256M \
 		-serial stdio
+
+
+run-shell: $(IMAGE)
+	qemu-system-i386 \
+		-cdrom $(IMAGE) \
+		-monitor stdio
 
 # ───────────────────────────────────────────────────────────────
 # Clean, re
