@@ -7,6 +7,7 @@ void	kernel_main(void *mboot_ptr)
 
 	print_multiboot_data(mboot_ptr);
 	print_kernel_stack(NBR_SCREENS);
+	print_gdt_address(NBR_SCREENS);
 
 	active_keyboard();
 }

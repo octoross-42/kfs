@@ -103,6 +103,4 @@ typedef struct {
 void	gdt_init_flat(void);
 void	gdt_flush(void);
 
-# include "kprint.h"
-
 #endif

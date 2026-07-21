@@ -1,4 +1,4 @@
-# include "kernel.h"
+# include "debug.h"
 
 typedef struct multiboot_mmap_entry_s
 {

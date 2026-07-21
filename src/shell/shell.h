@@ -6,6 +6,7 @@
 # include "ansi.h"
 # include "gdt.h"
 # include "ctype.h"
+# include "debug.h"
 
 # define SHELL_BUFFER_LEN 128
 

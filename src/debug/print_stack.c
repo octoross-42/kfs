@@ -6,11 +6,11 @@
 /*   By: octoross <octoross@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/06/19 17:05:00 by octoross          #+#    #+#             */
-/*   Updated: 2026/07/02 22:47:39 by octoross         ###   ########.fr       */
+/*   Updated: 2026/07/21 18:08:17 by octoross         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "gdt.h"
+#include "debug.h"
 
 extern uint32_t stack_top;
 

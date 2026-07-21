@@ -15,21 +15,24 @@ NASM_SRC	= src/boot/boot.s \
 			  src/drivers/io/io.s \
 			  src/lib/string/strlen.s \
 			  src/lib/string/strncmp.s \
-			  src/gdt/lgdt.s
+			  src/gdt/lgdt.s \
+			  src/asm/get_registers.s
 
 C_SRC		= src/kernel/kernel.c \
-			  src/kernel/print_multiboot_data.c \
 			  src/gdt/gdt.c \
-			  src/gdt/print_stack.c \
 			  src/drivers/vga/vga.c \
 			  src/drivers/keyboard/keyboard.c \
 			  src/drivers/serial/serial_com1.c \
 			  src/lib/kprint/kfprintf.c \
 			  src/lib/kprint/printk.c \
 			  src/lib/ansi/ansi.c \
-			  src/shell/shell.c
+			  src/shell/shell.c \
+			  src/debug/print_gdt_address.c \
+			  src/debug/print_multiboot_data.c \
+			  src/debug/print_stack.c
 
 INCLUDE_DIR	= src/kernel \
+			  src/debug \
 			  src/drivers/io \
 			  src/drivers/vga \
 			  src/drivers/keyboard \
