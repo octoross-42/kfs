@@ -3,7 +3,6 @@ extern stack_top
 
 section .text
 	global gdt_flush
-	global get_esp
 
 gdt_flush:
 	; on reload la table gdt
@@ -28,8 +27,3 @@ gdt_flush:
 	; ne recharge pas la stack, juste le descriptor de kernel stack
     mov ss, ax
     ret
-
-get_esp:
-	mov eax, esp
-	add eax, 4			; ret fera + 4
-	ret
